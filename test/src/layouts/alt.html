@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><%= title %></title>
+  <meta name="author" content="<%= obj.author ? author : '' %>">
+  <meta name="description" content="<%= obj.description ? description : '' %>">
+  <% if (obj.keywords) { %>
+    <meta name="keywords" content="<% keywords.forEach(function(keyword) { %><%= keyword %>, <% }) %>">
+  <% } %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <% if (obj.stylesheet) { %>
+    <link rel="stylesheet" href="<%= stylesheet %>">
+  <% } %>
+  <link rel="icon" href="favicon.png">
+  <link rel="apple-touch-icon-precomposed" href="apple-touch-icon.png">
+</head>
+<body class="container px2">
+
+  <pre>ALT LAYOUT</pre>
+
+  <header class="py2 border-bottom">
+    <h1><%= title %></h1>
+    <p><%= description %></p>
+  </header>
+
+  <div class="clearfix py2 mxn2">
+    <div class="sm-col sm-col-4 px2">
+      <%= include('nav') %>
+    </div>
+    <div class="sm-col sm-col-8 px2">
+      <%= content %>
+    </div>
+  </div>
+
+  <%= include('footer') %>
+
+</body>
+</html>
+

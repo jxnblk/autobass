@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title><%= title %></title>
+  <meta name="author" content="<%= obj.author ? author : '' %>">
+  <meta name="description" content="<%= obj.description ? description : '' %>">
+  <% if (obj.keywords) { %>
+    <meta name="keywords" content="<% keywords.forEach(function(keyword) { %><%= keyword %>, <% }) %>">
+  <% } %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <% if (obj.stylesheet) { %>
+    <link rel="stylesheet" href="<%= stylesheet %>">
+  <% } %>
+  <link rel="icon" href="favicon.png">
+  <link rel="apple-touch-icon-precomposed" href="apple-touch-icon.png">
+</head>
+<body>
+
+<%= content %>
+
+</body>
+</html>

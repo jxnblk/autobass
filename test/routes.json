@@ -1,0 +1,23 @@
+{
+  "home": {
+    "title": "Home",
+    "path": "/"
+  },
+  "docs": {},
+  "about": {},
+  "modules": {
+    "title": "Modules",
+    "routes": {
+      "flex-object": {
+        "title": "Flex Object",
+        "source": "flex-object"
+      },
+      "basscss-grid": {
+        "title": "Grid",
+        "source": "basscss-grid"
+      },
+      "basscss-utility-layout": {
+      }
+    }
+  }
+}

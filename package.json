@@ -1,0 +1,27 @@
+{
+  "name": "autobass",
+  "version": "1.0.0",
+  "description": "Automated modular documentation system",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "author": "Brent Jackson",
+  "license": "MIT",
+  "dependencies": {
+    "front-matter": "^0.2.1",
+    "gulp": "^3.8.10",
+    "gulp-rename": "^1.2.0",
+    "lodash": "^3.0.0",
+    "marked": "^0.3.3",
+    "marked-example": "^1.0.4",
+    "through2": "^0.6.3",
+    "marky-markdown": "^4.0.0",
+    "humanize-plus": "^1.5.0",
+    "cheerio": "^0.18.0"
+  },
+  "devDependencies": {
+    "basscss-grid": "0.0.14",
+    "flex-object": "^1.0.4"
+  }
+}
