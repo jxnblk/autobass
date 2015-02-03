@@ -1,6 +1,6 @@
 {
   "name": "autobass",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Automated modular documentation system",
   "main": "index.js",
   "scripts": {
