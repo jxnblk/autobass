@@ -17,6 +17,8 @@ module.exports = function() {
 
   var self = this;
 
+  this.parent = module.parent;
+
   this.parseModules = parseModules;
   this.formatRoutes = formatRoutes;
 
@@ -30,7 +32,6 @@ module.exports = function() {
     }
 
     _.defaults(data, {
-      root: data.dest,
       helpers: {},
       partials: {},
       routes: {},
