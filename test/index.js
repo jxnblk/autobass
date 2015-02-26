@@ -9,6 +9,7 @@ data.modules = [
   'flex-object'
 ];
 
+data.root = path.join(__dirname, '..');
 data.source = path.join(__dirname, './src');
 data.dest = path.join(__dirname, './dest');
 

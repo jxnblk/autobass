@@ -9,19 +9,28 @@
   "author": "Brent Jackson",
   "license": "MIT",
   "dependencies": {
+    "basswork": "^1.2.0",
+    "cheerio": "^0.18.0",
+    "cssstats": "^1.2.1",
     "front-matter": "^0.2.1",
     "gulp": "^3.8.10",
     "gulp-rename": "^1.2.0",
+    "humanize-plus": "^1.5.0",
     "lodash": "^3.0.0",
     "marked": "^0.3.3",
     "marked-example": "^1.0.4",
-    "through2": "^0.6.3",
-    "humanize-plus": "^1.5.0",
-    "cheerio": "^0.18.0"
+    "rework-calc": "^1.1.0",
+    "rework-custom-media": "^0.2.0",
+    "rework-plugin-colors": "^1.0.3",
+    "rework-vars": "^3.1.1",
+    "through2": "^0.6.3"
   },
   "devDependencies": {
     "basscss-grid": "0.0.14",
-    "flex-object": "^1.0.4"
+    "basscss-utility-layout": "0.0.2",
+    "flex-object": "^1.0.4",
+    "rework": "^1.0.1",
+    "rework-npm": "^1.0.0"
   },
   "directories": {
     "test": "test"
