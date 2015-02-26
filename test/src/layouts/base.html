@@ -27,6 +27,9 @@
       <%= include('nav') %>
     </div>
     <div class="sm-col sm-col-8 px2">
+      <% if (obj.page.css) { %>
+        <pre><%= obj.page.css %></pre>
+      <% } %>
       <%= content %>
     </div>
   </div>
