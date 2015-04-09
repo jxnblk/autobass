@@ -1,0 +1,23 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head>
+  <meta charset="utf-8">
+  <title><%= obj.title %></title>
+  <meta name="author" content="<%= obj.author %>">
+  <meta name="description" content="<%= obj.description %>">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <% if (obj.favicon) { %>
+    <link rel="icon" href="<%= favicon %>">
+  <% } %>
+  <% if (obj.stylesheets) { %>
+    <% obj.stylesheets.forEach(function(stylesheet) { %>
+      <link rel="stylesheet" href="<%= stylesheet %>">
+    <% }) %>
+  <% } %>
+</head>
+<body>
+
+  <%= obj.body %>
+
+</body>
+</html>

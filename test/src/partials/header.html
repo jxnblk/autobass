@@ -1,0 +1,38 @@
+
+
+<header>
+  <h1><%= title %></h1>
+  <p><%= description %></p>
+  <ul class="list-reset">
+    <% obj.routes.map(link) %>
+  </ul>
+</header>
+
+
+<% function link(route) { %>
+  <li>
+    <a href="<%= route.fullpath %>">
+      <%= route.title %>
+    </a>
+    <% if (route.sections) { %>
+      <ul class="list-reset h6 ml2">
+        <% route.sections.map(sectionLink, route) %>
+      </ul>
+    <% } %>
+    <% if (route.routes) { %>
+      <ul class="list-reset ml1">
+        <% route.routes.map(link) %>
+      </ul>
+    <% } %>
+  </li> 
+<% } %>
+
+<% function sectionLink(section) { %>
+  <li>
+    <a href="<%= this.fullpath + '/#' + _.kebabCase(section.content) %>">
+      <%= section.content %>
+    </a>
+  </li>
+<% } %>
+
+
