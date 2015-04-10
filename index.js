@@ -4,6 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var marked = require('marked');
 var toc = require('markdown-toc');
+var colors = require('colors');
 
 var renderer = require('./lib/marked-renderer');
 var read = require('./lib/read');
@@ -47,14 +48,15 @@ module.exports = function(opts) {
     var content;
     var ext = '';
 
-    if (route.filename) {
+    content = route.content || false;
+   
+    if (!content && route.filename) {
       filepath = path.join(opts.src, route.path + '/' + route.filename);
-    } else {
+    } else if (!content) {
       ext = 'md';
       filepath = path.join(opts.src, route.path + '/index.md');
     }
 
-    content = route.content || false;
     if (!content) {
       content = fs.existsSync(filepath) ? fs.readFileSync(filepath, 'utf8') : false;
     }
@@ -157,6 +159,8 @@ module.exports = function(opts) {
     locals.page = route;
     locals.include = include;
     locals.body = _.template(route.body)(locals);
+    
+   
     if (route.ext.match(opts.MD_MATCH)) {
       locals.body = marked(locals.body, { renderer: renderer });
     }
