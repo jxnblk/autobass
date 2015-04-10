@@ -2,74 +2,187 @@
 var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
+var marked = require('marked');
+var toc = require('markdown-toc');
+var colors = require('colors');
 
+var renderer = require('./lib/marked-renderer');
 var read = require('./lib/read');
-var extend = require('./lib/extend');
-var helpers = require('./lib/helpers');
 var include = require('./lib/include');
-var formatRoutes = require('./lib/format-routes');
-var parseModules = require('./lib/parse-modules');
-var humanizeName = require('./lib/humanize-name');
-var generatePages = require('./lib/generate-pages');
+
+module.exports = function(opts) {
+
+  var opts = opts || {};
+  var pages = [];
+
+  opts = _.defaults(opts, {
+    layout: fs.readFileSync(path.join(__dirname, './layout.html'), 'utf8'),
+    partials: {},
+    MD_MATCH: /md|markdown/,
+  });
+
+  function createFullPaths(routes, newRoutes, prefix) {
+    var prefix = prefix || false;
+    var newRoutes = newRoutes || [];
+    routes.forEach(function(route) {
+      route.title = route.title || _.capitalize(route.name);
+      if (prefix) {
+        route.parent = prefix;
+        route.path = prefix.path + route.path;
+      } else {
+        route.path = route.path;
+        newRoutes.push(route);
+      }
+      if (route.routes) {
+        createFullPaths(route.routes, newRoutes, route);
+      }
+    });
+    return newRoutes;
+  }
 
 
-module.exports = function() {
+  function createRouteObj(route, i, arr) {
 
-  var self = this;
+    var obj;
+    var filepath;
+    var content;
+    var ext = '';
 
-  this.parent = module.parent;
-
-  this.parseModules = parseModules;
-  this.formatRoutes = formatRoutes;
-
-  this.init = function(data) {
-
-    if (!data.source) {
-      console.error('No source provided');
+    content = route.content || false;
+   
+    if (!content && route.filename) {
+      filepath = path.join(opts.src, route.path + '/' + route.filename);
+    } else if (!content) {
+      ext = 'md';
+      filepath = path.join(opts.src, route.path + '/index.md');
     }
-    if (!data.dest) {
-      console.error('No destination provided');
+
+    if (!content) {
+      content = fs.existsSync(filepath) ? fs.readFileSync(filepath, 'utf8') : false;
+    }
+    if (!content) {
+      ext = 'html';
+      filepath = filepath.replace(/\.md$/, '.html');
+      content = fs.existsSync(filepath) ? fs.readFileSync(filepath, 'utf8') : false;
+    }
+    if (!content) {
+      console.log(('No template found for ' + route.path).red);
+      return false;
     }
 
-    _.defaults(data, {
-      helpers: {},
-      partials: {},
-      routes: {},
-      title: humanizeName(data.name),
-      include: include,
-      extend: extend
+    obj = _.defaults(route, {
+      body: content,
+      ext: ext,
     });
 
-    _.forIn(data, function(val, key) {
-      self[key] = val;
-    });
+    if (route.routes) {
+      route.routes = route.routes.map(createRouteObj, route);
+      obj.routes = route.routes;
+    }
 
-    if (self.layout) {
-      this.defaultLayout = read(path.join(self.source, self.layout));
+    if (route.layout) {
+      obj.layout = route.layout;
+    }
+
+    return obj;
+
+  }
+
+
+  function addBreadcrumbs(route) {
+    var breadcrumbs = [];
+    function getParent(r) {
+      var p;
+      if (r.parent) {
+        p = r.parent;
+        breadcrumbs.unshift({
+          name: r.parent.name,
+          title: r.parent.title,
+          path: r.parent.path,
+        });
+        if (p.parent) {
+          getParent(p);
+        }
+      }
+    }
+    getParent(route);
+    route.breadcrumbs = breadcrumbs;
+    if (route.routes) {
+      route.routes = route.routes.map(addBreadcrumbs);
+    }
+    return route;
+  }
+
+
+  function addPreviousNext(route, i, arr) {
+    if (arr[i+1]) {
+      route.next = arr[i+1];
+    } else if (route.routes) {
+      route.next = route.routes[0];
+    } else if (route.parent && route.parent.next) {
+      route.next = route.parent.next;
+    }
+    if (arr[i-1]) {
+      route.previous = arr[i-1];
+    } else if (route.parent) {
+      route.previous = route.parent;
+    }
+    if (route.routes) {
+      route.routes = route.routes.map(addPreviousNext);
+    }
+    return route;
+  }
+
+
+  function addTOC(route) {
+    opts.page = route.page;
+    if (route.ext.match(opts.MD_MATCH)) {
+      route.sections = toc(_.template(route.body)(opts)).json;
+    }
+    if (route.routes) {
+      route.routes = route.routes.map(addTOC);
+    }
+    return route;
+  }
+
+
+  function renderPage(route) {
+    var layout;
+    var locals = opts;
+
+    if (route.layout) {
+      layout = fs.readFileSync(path.join(opts.src, route.layout), 'utf8');
     } else {
-      this.defaultLayout = read(path.join(__dirname, './layouts/default.html'));
+      layout = opts.layout;
     }
 
-    this.layout = this.defaultLayout;
-
-    _.forIn(helpers, function(val, key) {
-      this[key] = val;
-    });
-    _.forIn(this.helpers, function(val, key) {
-      this[key] = val;
-    });
-
-    if (this.modules) {
-      this.modules = this.parseModules(this.modules);
+    locals.page = route;
+    locals.include = include;
+    locals.body = _.template(route.body)(locals);
+    
+   
+    if (route.ext.match(opts.MD_MATCH)) {
+      locals.body = marked(locals.body, { renderer: renderer });
     }
-
-    this.formatRoutes(this.routes);
-
+    route.body = _.template(layout)(locals);
+    if (route.routes) {
+      route.routes = route.routes.map(renderPage);
+    }
+    return route;
   };
 
-  this.compile = generatePages;
 
-  return this;
+  opts.routes = createFullPaths(opts.routes);
+
+  opts.routes = opts.routes.map(createRouteObj);
+  opts.routes = opts.routes.map(addTOC);
+  opts.routes = opts.routes.map(addBreadcrumbs);
+  opts.routes = opts.routes.map(addPreviousNext);
+  pages = opts.routes.map(renderPage);
+
+
+  return pages;
+
 
 };
 
